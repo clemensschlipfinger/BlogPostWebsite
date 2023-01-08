@@ -1,0 +1,13 @@
+name: itpl-blogpost
+services:
+  mysql:
+    image: mysql:8.0.30
+    environment:
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'password'    
+    volumes:
+      - mysql-volume:/var/lib/mysql
+    ports:
+      - 127.0.0.1:3306:3306
+volumes:
+  mysql-volume:

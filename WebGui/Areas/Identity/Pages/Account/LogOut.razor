@@ -1,0 +1,12 @@
+@page "/Identity/Account/LogOut"
+
+@inject NavigationManager NavigationManager;
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.NavigateTo("/Identity/AccountController/LogOut",true);
+    }
+
+}

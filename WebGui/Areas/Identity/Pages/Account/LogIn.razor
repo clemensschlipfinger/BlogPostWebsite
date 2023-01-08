@@ -1,0 +1,78 @@
+@page "/Identity/Account/Login"
+@using Microsoft.AspNetCore.Identity
+@using Model.Entities
+@using Microsoft.AspNetCore.Components
+@using WebGui.Areas.Identity.Controller
+@using WebGui.Areas.Models
+@using Domain.Repositories.Implementations
+@using MudBlazor.Extensions
+@using MudBlazor.Utilities
+
+@inject UserManager<User> UserManager
+@inject NavigationManager NavigationManager
+@inject UserRepository UserRepository
+@inject SignInManager<User> SignInManager
+
+<MudCard>
+    <MudForm Model="@User" @ref="@form" Validation="@(LogInInfoValidator.ValidateValue)" ValidationDelay="0">
+            <MudCardContent>
+                <MudTextField Label="User Name" HelperText="Enter your username"
+                              @bind-Value="User.UserName" For="@(() => User.UserName)"/>
+            
+                <MudTextField Label="Password" HelperText="Enter your strong password" Class="mt-3"
+                              @bind-Value="User.Password" For="@(() => User.Password)" InputType="InputType.Password" Error="@wrongPassword" TextChanged="() => wrongPassword = false" ErrorText="@errorText"/>
+            </MudCardContent>
+    </MudForm>
+    <MudCardActions>
+        <MudButton Disabled="@success"  Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await LoginUser())">Log in</MudButton>
+    </MudCardActions>
+</MudCard>
+
+
+
+@code {
+    bool success;
+    bool wrongPassword;
+    string errorText = "";
+    private MudForm form;
+
+    private LogInInfo User = new LogInInfo();
+    private LogInInfoValidator LogInInfoValidator;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        LogInInfoValidator = new LogInInfoValidator(UserRepository);
+    }
+    
+    public async Task LoginUser()
+    {
+        await form.Validate();
+
+        if (form.IsValid)
+        {
+            var user = await UserManager.FindByNameAsync(User.UserName);
+
+            if (await SignInManager.CanSignInAsync(user))
+            {
+                var result = await SignInManager.CheckPasswordSignInAsync(user, User.Password, false);
+                if (result == Microsoft.AspNetCore.Identity.SignInResult.Success)
+                {
+                    success = true;
+                    var token = AccountController.GenerateToken(user.UserName);
+                    NavigationManager.NavigateTo($"/Identity/AccountController/Login?token={token}", true);
+                }
+                else
+                {
+                    wrongPassword = true;
+                    errorText = "The password is invalid.";
+                }
+            }
+            else
+            {
+                wrongPassword = true;
+                errorText = "User is locked.";
+            }
+        }
+    }
+}

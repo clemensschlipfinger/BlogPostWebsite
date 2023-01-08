@@ -1,0 +1,63 @@
+@page "/Identity/Account/Register"
+@using Microsoft.AspNetCore.Identity
+@using Model.Entities
+@using Microsoft.AspNetCore.Components
+@using System.ComponentModel.DataAnnotations
+@using System.Formats.Asn1
+@using Domain.Repositories.Implementations
+@using WebGui.Areas.Models
+
+@inject UserManager<User> UserManager
+@inject UserRepository UserRepository; 
+
+<MudCard>
+    <MudForm Model="@User" @ref="@form" Validation="@(RegisterInfoValidator.ValidateValue)" ValidationDelay="0">
+            <MudCardContent>
+                <MudTextField Label="User Name" HelperText="Enter your username"
+                              @bind-Value="User.UserName" For="@(() => User.UserName)"/>
+            
+                <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
+                              @bind-Value="User.Password" For="@(() => User.Password)" InputType="InputType.Password"/>
+                <MudTextField Label="Password" HelperText="Repeat the password" Class="mt-3"
+                              @bind-Value="User.Password2" For="@(() => User.Password2)" InputType="InputType.Password" />
+            
+                <MudTextField Label="First Name" HelperText="Enter your first name" Class="mt-3"
+                              @bind-Value="User.FirstName" For="@(() => User.FirstName)"/>
+                <MudTextField Label="Last Name" HelperText="Enter your last name" Class="mt-3"
+                              @bind-Value="User.LastName" For="@(() => User.LastName)"/>
+            </MudCardContent>
+    </MudForm>
+    <MudCardActions>
+        <MudButton Disabled="@success"  Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await RegisterUser())">Register</MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    bool success;
+    
+    public RegisterInfo User = new RegisterInfo();
+    
+    private MudForm form;
+
+    private RegisterInfoValidator RegisterInfoValidator;
+
+    protected override Task OnInitializedAsync()
+    {
+        base.OnInitializedAsync();
+        RegisterInfoValidator = new RegisterInfoValidator(UserRepository, UserManager);
+        return Task.CompletedTask;
+    }
+
+    public async Task RegisterUser()
+    {
+        await form.Validate();
+
+        if (form.IsValid)
+        {
+            success = true;
+            await UserManager.CreateAsync(new User() { UserName = User.UserName, FirstName = User.FirstName, LastName = User.LastName}, User.Password);
+        }
+        
+    }
+}
+
