@@ -15,19 +15,26 @@
        </AuthorizeView>
        <MudMenu>
             <ActivatorContent>
-                <MudAvatar Color="Color.Secondary">A</MudAvatar>
-            </ActivatorContent>
-           <ChildContent>
-               <AuthorizeView>
+                <AuthorizeView>
                    <Authorized>
-                       <MudMenuItem Href="/Identity/Account/Manage">Manage</MudMenuItem>
-                       <MudMenuItem Href="Identity/Account/LogOut">Log out</MudMenuItem>
+                       <MudAvatar Color="Color.Secondary">@Char.ToUpper(context.User.Identity?.Name.ToCharArray().First() ?? 'A')</MudAvatar>
                    </Authorized>
                    <NotAuthorized>
-                       <MudMenuItem Href="Identity/Account/Register">Register</MudMenuItem>
-                       <MudMenuItem Href="Identity/Account/Login">Log in</MudMenuItem>
+                        <MudAvatar Color="Color.Secondary"></MudAvatar>
                    </NotAuthorized>
-               </AuthorizeView>
+                </AuthorizeView>
+            </ActivatorContent>
+           <ChildContent>
+                <AuthorizeView>
+                   <Authorized>
+                       <MudMenuItem Href="/Identity/Account/Manage">Manage</MudMenuItem>
+                       <MudMenuItem Href="/Identity/Account/LogOut">Log out</MudMenuItem>
+                   </Authorized>
+                   <NotAuthorized>
+                       <MudMenuItem Href="/Identity/Account/Register">Register</MudMenuItem>
+                       <MudMenuItem Href="/Identity/Account/Login">Log in</MudMenuItem>
+                   </NotAuthorized>
+                </AuthorizeView>
            </ChildContent>
        </MudMenu>
     </MudAppBar>
