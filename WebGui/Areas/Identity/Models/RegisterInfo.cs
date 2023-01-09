@@ -26,7 +26,7 @@ public class RegisterInfoValidator : AbstractValidator<RegisterInfo>
 
         RuleFor(x => x.UserName)
             .NotEmpty()
-            .Must((value, cancellationToken) => IsUniqueUserName(value.Password))
+            .Must((value, cancellationToken) => IsUniqueUserName(value.UserName))
             .WithMessage("The username is already taken.");
 
         RuleFor(x => x.Password)
