@@ -1,10 +1,9 @@
-using System.ComponentModel.DataAnnotations;
 using Domain.Repositories.Implementations;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Model.Entities;
 
-namespace WebGui.Areas.Models;
+namespace WebGui.Areas.Identity.Models;
 
 public class RegisterInfo
 {
