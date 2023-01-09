@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider />
+<MudThemeProvider @ref="@mudThemeProvider" @bind-IsDarkMode="@isDarkMode"/>
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -57,5 +57,17 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+    
+    private bool isDarkMode;
+    private MudThemeProvider mudThemeProvider;
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isDarkMode = await mudThemeProvider.GetSystemPreference();
+            StateHasChanged();
+        }
     }
 }
