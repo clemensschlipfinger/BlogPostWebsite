@@ -19,4 +19,6 @@ public class UserRepository : ARepository<User>
     {
         return base.Table.Any(u => u.UserName == userName);
     }
+    
+    public async Task<User?> ReadAsync(string id) => Table.Find(id);
 }

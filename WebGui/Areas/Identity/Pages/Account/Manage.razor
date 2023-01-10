@@ -1,5 +1,57 @@
-<h3>Manage</h3>
+@page "/Identity/Account/Manage"
+@attribute [Authorize]
+
+@using Domain.Repositories.Implementations
+@using Model.Entities
+@inject UserRepository UserRepository; 
+
+<EditForm Model="@user" OnValidSubmit="Apply">
+<DataAnnotationsValidator/>
+<MudGrid>
+    <MudItem xs="8">
+        <MudPaper Class="d-flex flex-column mud-width-full mud-height-full py-6 px-4">
+            <MudField Variant="Variant.Text" Class="mb-3" Label="Username">
+                @user.UserName
+            </MudField>
+            <MudTextField T="string" Variant="Variant.Text" Class="mb-3" Label="First Name" @bind-Value="@user.FirstName" For="@(()=> user.FirstName)"/>
+            <MudTextField T="string" Variant="Variant.Text" Label="Last Name" @bind-Value="@user.LastName" For="@(()=> user.LastName)"/>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="4">
+        <MudPaper Class="mud-width-full mud-height-full d-flex justify-center py-4 px-4">
+            <MudAvatar Color="Color.Secondary" Class="align-self-center" Style=";width: 100px; height: 100px;">@Char.ToUpper(user.UserName.ToCharArray().FirstOrDefault('A'))</MudAvatar>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12">
+        <MudPaper Class="py-4 px-4">
+            <MudTextField T="string" Label="Description" Variant="Variant.Text" Lines="5" @bind-Value="@user.Description" For="@(()=> user.Description)"/>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12">
+        <MudPaper Class="mud-width-full mud-height-full d-flex justify-center py-4 px-4">
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Apply</MudButton>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+</EditForm>
 
 @code {
+    private User user { get; set; } = new User() { UserName = string.Empty, FirstName = string.Empty, LastName = "", Description = ""};
     
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private MudForm form;
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitializedAsync();
+        var _user = (await authenticationStateTask).User;
+        user = (await UserRepository.ReadAsync(u => u.UserName == _user.Identity.Name)).First();
+    }
+
+    private async Task Apply()
+    {
+       await UserRepository.UpdateAsync(user);
+    }
 }
