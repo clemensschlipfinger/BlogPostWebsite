@@ -6,12 +6,18 @@
 @inject CommentRepository commentRepository
 @inject UserRepository userRepository
 
+@inject AuthenticationStateProvider authenticationStateProvider
+
 <MudStack>
     <MudPaper Class="px-8 py-8">
         <ReadBlogPost BlogPost="@blogPost"></ReadBlogPost>
     </MudPaper>
-    <UserInfo User="@user"></UserInfo>
-    <WriteComment User="@user" Post="@blogPost" ResetOnCreate="true" OnCreatedComment="@OnCommentCreate"/>
+    <UserInfo User="@author"></UserInfo>
+    <AuthorizeView>
+        <Authorized>
+            <WriteComment User="@user" Post="@blogPost" ResetOnCreate="true" OnCreatedComment="@OnCommentCreate"/>
+        </Authorized>    
+    </AuthorizeView>
     @if(comments != null) {
         @foreach (var c in comments)
         {
@@ -23,6 +29,8 @@
 {
     private BlogPost blogPost { get; set; }
     private List<Comment> comments { get; set; }
+    private User author { get; set; }
+    
     private User user { get; set; }
     
     [Parameter]
@@ -33,8 +41,14 @@
        base.OnInitializedAsync();
 
         blogPost = await blogPostRepository.ReadAsync(Id);
-        user = await userRepository.GetUserByPost(blogPost);
+        author = await userRepository.GetUserByPost(blogPost);
         comments = await commentRepository.GetCommentsByPost(blogPost);
+        
+        var _user = (await authenticationStateProvider.GetAuthenticationStateAsync()).User;
+        if(_user.Identity.IsAuthenticated)
+        {
+            user = (await userRepository.ReadAsync(u => u.UserName == _user.Identity.Name)).First();
+        } 
     }
 
     private async Task OnCommentCreate(Comment created)

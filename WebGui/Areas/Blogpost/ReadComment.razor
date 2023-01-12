@@ -8,14 +8,18 @@
         <MudPaper Class="px-8 py-8">
             <MudStack>
                 <MudField Label="@(String.Format($"{Comment.Author?.FullName()} at {Comment.LastEditedAt}"))">@Comment.Body</MudField>
-                <MudContainer Class="px-0 mx-0 d-flex">
-                    <MudIconButton Class="px-0 mx-0" Icon="@Icons.Filled.Reply" Size="Size.Small" @onclick="@(() => hideWriteComment = !hideWriteComment)"/> 
-                </MudContainer>
+                <AuthorizeView>
+                    <Authorized>
+                    <MudContainer Class="px-0 mx-0 d-flex">
+                        <MudIconButton Class="px-0 mx-0" Icon="@Icons.Filled.Reply" Size="Size.Small" @onclick="@(() => hideWriteComment = !hideWriteComment)"/> 
+                    </MudContainer>
+                    </Authorized>
+                </AuthorizeView>
             </MudStack>
         </MudPaper>
         <MudStack Class="ml-8">
-            <p hidden="@hideWriteComment" >
-                <WriteComment User="@User" Post="@Comment" ResetOnCreate="true" OnCreatedComment="@OnCommentCreate"/>
+            <p hidden="@hideWriteComment">
+                        <WriteComment User="@User" Post="@Comment" ResetOnCreate="true" OnCreatedComment="@OnCommentCreate"/>
             </p>
             @if (Comment.ChildComments != null)
             {

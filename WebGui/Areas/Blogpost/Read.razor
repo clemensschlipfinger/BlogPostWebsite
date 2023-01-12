@@ -18,7 +18,9 @@
     @foreach (var b in blogPosts)
     {
         <MudPaper Class="px-8 py-8 d-flex">
-            <ReadBlogPost BlogPost="b"/>
+            <div style="flex-grow: 1">
+               <ReadBlogPost TitleTypo="Typo.h3" BlogPost="b"/> 
+            </div> 
             <div style="margin-left: 50px; align-self: center">
                 <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="() => NavigateTo(b.Id)">Show</MudButton>
             </div>
@@ -64,8 +66,11 @@
         foreach (var b in blogPosts)
         {
             BlogPost nb = new BlogPost() { Id = b.Id, Body = b.Body, Title = b.Title, LastEditedAt = b.LastEditedAt };
-            nb.Body = nb.Body.Substring(0, 255);
-            nb.Body = nb.Body + "...";
+            if (nb.Body.Length > 254)
+            {
+                nb.Body = nb.Body.Substring(0, 255);
+                nb.Body = nb.Body + "...";
+            }
             newPosts.Add(nb);
         }
         blogPosts = newPosts;

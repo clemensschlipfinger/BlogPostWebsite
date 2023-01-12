@@ -1,0 +1,55 @@
+@page "/Blogpost/Write/"
+@attribute [Authorize]
+
+@using Model.Entities
+@using Domain.Repositories.Implementations
+
+@inject BlogPostRepository blogPostRepository
+@inject UserRepository UserRepository;
+
+<MudStack>
+    <MudPaper Class="py-8 px-8">
+        <MudStack>
+            <MudTextField T="string" Label="Title" @bind-Value="@blogPost.Title"/>
+            <MarkdownEditor @bind-Value="@blogPost.Body" SpellChecker="false"/>
+        </MudStack>
+    </MudPaper>
+    <MudPaper Class="py-8 px-8 d-flex justify-center">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="@(async () => await CreateBlogPost())" Disabled="@created">Post</MudButton>
+    </MudPaper>
+    <MudPaper Class="py-8 px-8">
+        <ReadBlogPost BlogPost="@blogPost"/>
+    </MudPaper>
+</MudStack>
+
+@code {
+    private BlogPost blogPost { get; set; } = new BlogPost();
+    private User user { get; set; }
+    
+    private bool created = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitializedAsync();
+        var _user = (await authenticationStateTask).User;
+        user = (await UserRepository.ReadAsync(u => u.UserName == _user.Identity.Name)).First();
+    }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    
+    private async Task CreateBlogPost()
+    {
+        if (blogPost.Title == null || blogPost.Body == null || blogPost.Title == string.Empty || blogPost.Body == string.Empty)
+        {
+            return;
+        }
+        blogPost.IsPublished = true;
+        blogPost.LastEditedAt = DateTime.Now;
+        blogPost.AuthorId = user.Id;
+
+        await blogPostRepository.CreateAsync(blogPost);
+        
+        created = true;
+    }
+}

@@ -4,7 +4,7 @@
 @if (BlogPost != null)
 {
     <MudStack>
-        <MudText Typo="Typo.h3">@BlogPost.Title</MudText>
+        <MudText Typo="@TitleTypo">@BlogPost.Title</MudText>
         <MudDivider/>
         <MudText Typo="Typo.caption">@BlogPost.LastEditedAt</MudText>
         <MudMarkdown Value="@BlogPost.Body" />
@@ -19,4 +19,7 @@ else
 {
     [Parameter]
     public BlogPost BlogPost { get; set; }
+
+    [Parameter]
+    public Typo TitleTypo { get; set; } = Typo.h1;
 }
