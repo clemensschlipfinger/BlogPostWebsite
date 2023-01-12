@@ -54,11 +54,13 @@
         if (ResetOnCreate)
         {
             created = false;
+            error = false;
             Comment = new Comment() { Body = string.Empty };
         }
         else
         {
             created = true;
+            error = false;
         }
 
     }

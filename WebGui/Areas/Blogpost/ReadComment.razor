@@ -7,7 +7,7 @@
         
         <MudPaper Class="px-8 py-8">
             <MudStack>
-                <MudField Label="@Comment.Author?.FullName()">@Comment.Body</MudField>
+                <MudField Label="@(String.Format($"{Comment.Author?.FullName()} at {Comment.LastEditedAt}"))">@Comment.Body</MudField>
                 <MudContainer Class="px-0 mx-0 d-flex">
                     <MudIconButton Class="px-0 mx-0" Icon="@Icons.Filled.Reply" Size="Size.Small" @onclick="@(() => hideWriteComment = !hideWriteComment)"/> 
                 </MudContainer>

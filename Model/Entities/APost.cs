@@ -21,7 +21,7 @@ public class APost {
     [Required]
     [Column("AUTHOR_ID")]
     public string AuthorId { get; set; }
-
+    
     public virtual User Author { get; set; }
     
     public virtual List<Comment> ChildComments { get; set; } 

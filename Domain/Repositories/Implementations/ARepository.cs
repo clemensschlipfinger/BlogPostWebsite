@@ -44,8 +44,8 @@ public abstract class ARepository<TEntity> : IRepository<TEntity> where TEntity 
 
     public async Task<TEntity?> ReadAsync(int id) => Table.Find(id);
 
-    public async Task<List<TEntity>> ReadAsync(Expression<Func<TEntity, bool>> filter) => 
-        await Table.Where(filter).ToListAsync();
+    public async Task<List<TEntity>> ReadAsync(Expression<Func<TEntity, bool>> filter, int limit = 100) => 
+        await Table.Where(filter).Take(100).ToListAsync();
 
     public async Task<List<TEntity>> ReadAsync(int start, int count) =>
         await Table.Skip(start)

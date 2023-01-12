@@ -1,44 +1,73 @@
-@page "/Blogpost/Read/{Id:int}"
+@page "/Blogpost/Read/"
+
 @using Domain.Repositories.Implementations
 @using Model.Entities
+@using HostingEnvironmentExtensions = Microsoft.AspNetCore.Hosting.HostingEnvironmentExtensions
+@using System.Reflection
 
+@inject NavigationManager navigationManager
 @inject BlogPostRepository blogPostRepository
-@inject CommentRepository commentRepository
-@inject UserRepository userRepository
 
 <MudStack>
-    <ReadBlogPost BlogPost="@blogPost"></ReadBlogPost>
-    <UserInfo User="@user"></UserInfo>
-    <WriteComment User="@user" Post="@blogPost" ResetOnCreate="true" OnCreatedComment="@OnCommentCreate"/>
-    @if(comments != null) {
-        @foreach (var c in comments)
-        {
-            <ReadComment User="@user" Comment="@c"/>
-        }
+    <MudPaper Class="px-8 py-8 d-flex">
+        <MudTextField T="string"  @bind-Value="@searchQuery" Label="Search" Class="mr-8"/>
+        <div style="margin-left: 20px; align-self: center">
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="@Search">Search</MudButton>
+        </div>
+    </MudPaper> 
+    @foreach (var b in blogPosts)
+    {
+        <MudPaper Class="px-8 py-8 d-flex">
+            <ReadBlogPost BlogPost="b"/>
+            <div style="margin-left: 50px; align-self: center">
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="() => NavigateTo(b.Id)">Show</MudButton>
+            </div>
+        </MudPaper>
     }
 </MudStack>
 @code
 {
-    private BlogPost blogPost { get; set; }
-    private List<Comment> comments { get; set; }
-    private User user { get; set; }
-    
-    [Parameter]
-    public int Id { get; set; }
+    private string searchQuery { get; set; } = string.Empty;
+    private List<BlogPost> blogPosts { get; set; } = new List<BlogPost>();
 
+    private void NavigateTo(int blogPostId)
+    {
+       navigationManager.NavigateTo($"/BlogPost/Read/{blogPostId}"); 
+    }
+    
     protected override async Task OnInitializedAsync()
     {
        base.OnInitializedAsync();
-
-        blogPost = await blogPostRepository.ReadAsync(Id);
-        user = await userRepository.GetUserByPost(blogPost);
-        comments = await commentRepository.GetCommentsByPost(blogPost);
+        await LoadRecent();
     }
 
-    private async Task OnCommentCreate(Comment created)
+    private async Task LoadRecent()
     {
-        comments.Add(created);
-        StateHasChanged();
+        blogPosts = await blogPostRepository.ReadRecentAsync();
+        BlogPostsToPreview();
     }
 
+    private async Task Search()
+    {
+        if (searchQuery == null || searchQuery == string.Empty)
+        {
+            await LoadRecent();
+            return;
+        }
+        blogPosts = await blogPostRepository.ReadAsync(b => b.Title.Contains(searchQuery));
+        BlogPostsToPreview();
+    }
+
+    private void BlogPostsToPreview()
+    {
+        List<BlogPost> newPosts = new List<BlogPost>();
+        foreach (var b in blogPosts)
+        {
+            BlogPost nb = new BlogPost() { Id = b.Id, Body = b.Body, Title = b.Title, LastEditedAt = b.LastEditedAt };
+            nb.Body = nb.Body.Substring(0, 255);
+            nb.Body = nb.Body + "...";
+            newPosts.Add(nb);
+        }
+        blogPosts = newPosts;
+    }
 }

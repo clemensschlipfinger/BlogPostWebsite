@@ -1,17 +1,19 @@
 @using Domain.Repositories.Interfaces
 @using Model.Entities
 
-<MudPaper Class="px-8 py-8">
-    @if (BlogPost != null)
-    {
-        <MudText Typo="Typo.h3" Class="mb-4">@BlogPost.Title</MudText>
+@if (BlogPost != null)
+{
+    <MudStack>
+        <MudText Typo="Typo.h3">@BlogPost.Title</MudText>
+        <MudDivider/>
+        <MudText Typo="Typo.caption">@BlogPost.LastEditedAt</MudText>
         <MudMarkdown Value="@BlogPost.Body" />
-    }
-    else
-    {
-        <MudText>...</MudText>
-    }
-</MudPaper>
+    </MudStack>
+}
+else
+{
+    <MudText>...</MudText>
+}
 
 @code
 {
