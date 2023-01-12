@@ -37,12 +37,20 @@
             error = true;
             return;
         }
-        
-        Comment.AuthorId = User.Id;
-        Comment.ParentPostId = Post.Id;
-        
-        await commentRepository.CreateAsync(Comment);
 
+        {
+            Comment.AuthorId = User.Id;
+            Comment.ParentPostId = Post.Id;
+
+            await commentRepository.CreateAsync(Comment);
+            
+
+            if (OnCreatedComment == null)
+                return;
+            
+            await OnCreatedComment(this.Comment);
+        }
+        
         if (ResetOnCreate)
         {
             created = false;
@@ -53,9 +61,5 @@
             created = true;
         }
 
-        if (OnCreatedComment == null)
-            return; 
-        
-        await OnCreatedComment(Comment);
     }
 }
