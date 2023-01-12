@@ -7,7 +7,7 @@
         
         <MudPaper Class="px-8 py-8">
             <MudStack>
-                <MudField Label="@Comment.Author.FullName()">@Comment.Body</MudField>
+                <MudField Label="@Comment.Author?.FullName()">@Comment.Body</MudField>
                 <MudContainer Class="px-0 mx-0 d-flex">
                     <MudIconButton Class="px-0 mx-0" Icon="@Icons.Filled.Reply" Size="Size.Small" @onclick="@(() => hideWriteComment = !hideWriteComment)"/> 
                 </MudContainer>
@@ -15,7 +15,7 @@
         </MudPaper>
         <MudStack Class="ml-8">
             <p hidden="@hideWriteComment" >
-                <WriteComment User="@User" Post="@Comment" OnCreatedComment="@OnCommentCreate"/>
+                <WriteComment User="@User" Post="@Comment" ResetOnCreate="true" OnCreatedComment="@OnCommentCreate"/>
             </p>
             @if (Comment.ChildComments != null)
             {
@@ -46,7 +46,6 @@
 
     private async Task OnCommentCreate(Comment created)
     {
-        Comment.ChildComments.Add(created);
         hideWriteComment = true;
         StateHasChanged();
     }
