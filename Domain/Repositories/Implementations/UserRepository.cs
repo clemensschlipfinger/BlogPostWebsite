@@ -21,4 +21,11 @@ public class UserRepository : ARepository<User>
     }
     
     public async Task<User?> ReadAsync(string id) => Table.Find(id);
+    
+
+    public async Task<User?> GetUserByPost(APost blogPost)
+    {
+        return await Context.Posts.Where(p => p.Id == blogPost.Id)?.Join(Context.Users, p => p.AuthorId, u => u.Id, (b, u) => u).FirstAsync();
+    }
+    
 }

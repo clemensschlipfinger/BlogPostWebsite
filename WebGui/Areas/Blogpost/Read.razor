@@ -1,0 +1,44 @@
+@page "/Blogpost/Read/{Id:int}"
+@using Domain.Repositories.Implementations
+@using Model.Entities
+
+@inject BlogPostRepository blogPostRepository
+@inject CommentRepository commentRepository
+@inject UserRepository userRepository
+
+<MudStack>
+    <ReadBlogPost BlogPost="@blogPost"></ReadBlogPost>
+    <UserInfo User="@user"></UserInfo>
+    <WriteComment User="@user" Post="@blogPost" ResetOnCreate="true" OnCreatedComment="@OnCommentCreate"/>
+    @if(comments != null) {
+        @foreach (var c in comments)
+        {
+            <ReadComment User="@user" Comment="@c"/>
+        }
+    }
+</MudStack>
+@code
+{
+    private BlogPost blogPost { get; set; }
+    private List<Comment> comments { get; set; }
+    private User user { get; set; }
+    
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+       base.OnInitializedAsync();
+
+        blogPost = await blogPostRepository.ReadAsync(Id);
+        user = await userRepository.GetUserByPost(blogPost);
+        comments = await commentRepository.GetCommentsByPost(blogPost);
+    }
+
+    private async Task OnCommentCreate(Comment created)
+    {
+        comments.Add(created);
+        StateHasChanged();
+    }
+
+}

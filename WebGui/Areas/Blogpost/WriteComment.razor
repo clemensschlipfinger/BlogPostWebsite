@@ -1,0 +1,61 @@
+@using Model.Entities
+@using Domain.Repositories.Implementations
+@using MudBlazor.Extensions
+@inject CommentRepository commentRepository;
+
+<MudCard Class="px-8 py-4 mr-0 ml-0">
+    <MudCardContent Class="px-0 py-0">
+        <MudTextField T="string" Label="Write a Comment!" @bind-Value="@Comment.Body" Error="@error"/>
+    </MudCardContent>
+    <MudCardActions Class="d-flex justify-center mt-3">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="@(async () => await CreateComment())" Disabled="@created">Post</MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code
+{
+    private bool created = false;
+    private bool error = false;
+    [Parameter] 
+    public bool ResetOnCreate { get; set; }
+    
+    [Parameter]
+    public Func<Comment,Task>? OnCreatedComment { get; set; }
+
+    [Parameter]
+    public User User { get; set; }
+    
+    [Parameter]
+    public APost Post { get; set; }
+    
+    private Comment Comment { get; set; } = new Comment() { Body = string.Empty};
+
+    private async Task CreateComment()
+    {
+        if (User == null || Post == null || Comment.Body == null || Comment.Body == string.Empty)
+        {
+            error = true;
+            return;
+        }
+        
+        Comment.AuthorId = User.Id;
+        Comment.ParentPostId = Post.Id;
+        
+        await commentRepository.CreateAsync(Comment);
+
+        if (ResetOnCreate)
+        {
+            created = false;
+            Comment = new Comment() { Body = string.Empty };
+        }
+        else
+        {
+            created = true;
+        }
+
+        if (OnCreatedComment == null)
+            return; 
+        
+        await OnCreatedComment(Comment);
+    }
+}

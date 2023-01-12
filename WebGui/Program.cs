@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Model.Configurations;
 using Model.Entities;
+using MudBlazor;
 using MudBlazor.Services;
 using WebGui.Areas.Identity;
 
@@ -33,10 +34,11 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<User>>();
 builder.Services.AddScoped<UserRepository>(); 
-builder.Services.AddScoped<IRepository<BlogPost>, BlogPostRepository>();
-builder.Services.AddScoped<IRepository<Comment>, CommentRepository>();
+builder.Services.AddScoped<BlogPostRepository>();
+builder.Services.AddScoped<CommentRepository>();
 
 builder.Services.AddMudServices();
+builder.Services.AddMudMarkdownServices();
 
 var app = builder.Build();
 

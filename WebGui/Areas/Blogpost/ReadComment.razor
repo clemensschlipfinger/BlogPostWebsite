@@ -1,0 +1,53 @@
+@using Model.Entities
+@using Domain.Repositories.Implementations
+@using System.Threading.Channels
+
+    @if (Comment != null)
+    {
+        
+        <MudPaper Class="px-8 py-8">
+            <MudStack>
+                <MudField Label="@Comment.Author.FullName()">@Comment.Body</MudField>
+                <MudContainer Class="px-0 mx-0 d-flex">
+                    <MudIconButton Class="px-0 mx-0" Icon="@Icons.Filled.Reply" Size="Size.Small" @onclick="@(() => hideWriteComment = !hideWriteComment)"/> 
+                </MudContainer>
+            </MudStack>
+        </MudPaper>
+        <MudStack Class="ml-8">
+            <p hidden="@hideWriteComment" >
+                <WriteComment User="@User" Post="@Comment" OnCreatedComment="@OnCommentCreate"/>
+            </p>
+            @if (Comment.ChildComments != null)
+            {
+                @foreach (var c in  Comment.ChildComments)
+                {
+                    <ReadComment User="@User" Comment="@c"/>
+                }
+            }
+        </MudStack>
+    }
+    else
+    {
+        
+        <MudPaper Class="px-8 py-8">
+            <MudText>...</MudText>
+        </MudPaper>
+    }
+
+@code
+{
+    private bool hideWriteComment { get; set; } = true;
+    
+    [Parameter]
+    public Comment Comment { get; set; }
+    
+    [Parameter]
+    public User? User { get; set; }
+
+    private async Task OnCommentCreate(Comment created)
+    {
+        Comment.ChildComments.Add(created);
+        hideWriteComment = true;
+        StateHasChanged();
+    }
+}

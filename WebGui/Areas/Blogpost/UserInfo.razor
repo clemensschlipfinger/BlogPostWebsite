@@ -1,0 +1,19 @@
+@using Model.Entities
+
+<MudPaper Class="px-8 py-8 d-flex">
+    <MudAvatar Color="Color.Secondary" Class="align-self-center mr-8" Style=";width: 100px; height: 100px;">@Char.ToUpper((User?.UserName?.ToCharArray().First()) ?? 'A')</MudAvatar>
+    <MudStack Class="flex-grow-1">
+        <MudText>
+            @User?.FullName()
+        </MudText>
+        <MudDivider Class="mb-2"/>
+        <MudText>
+            @User?.Description
+        </MudText>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public User User { get; set; }
+}
