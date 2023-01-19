@@ -41,6 +41,7 @@
         {
             Comment.AuthorId = User.Id;
             Comment.ParentPostId = Post.Id;
+            Comment.LastEditedAt = DateTime.Now;
 
             await commentRepository.CreateAsync(Comment);
             
